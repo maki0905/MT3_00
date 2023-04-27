@@ -1,12 +1,14 @@
 #include <Novice.h>
 #include "Matrix4x4.h"
+#include "Vector3.h"
 
 const char kWindowTitle[] = "LE1A_16_マキユキノリ_タイトル";
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
-void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* name)
+void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* name);
+void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -64,4 +66,11 @@ void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* name)
 			Novice::ScreenPrintf(x + column * kColumnWidth, y + row * kRowHeight + 20, "%6.02f", matrix.m[row][column]);
 		}
 	}
+}
+
+void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
+	Novice::ScreenPrintf(x, y, "%.02f", vector.x);
+	Novice::ScreenPrintf(x + kColumnWidth, y, "%.02f", vector.y);
+	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%.02f", vector.z);
+	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
 }
