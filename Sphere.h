@@ -1,6 +1,6 @@
-#pragma once
-#include <Vector3.h>
+ï»¿#pragma once
+#include "Vector3.h"
 struct Sphere {
-	Vector3 center; // ’†S“_
-	float radius; // ”¼Œa
+	Vector3 center; // ä¸­å¿ƒç‚¹
+	float radius; // åŠå¾„
 };
