@@ -7,6 +7,7 @@
 #include <math.h>
 #include <cmath>
 #include <imgui.h>
+#include "Collision.h"
 
 
 const char kWindowTitle[] = "LE1A_16_マキユキノリ_タイトル";
@@ -30,8 +31,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// ライブラリの初期化
 	Novice::Initialize(kWindowTitle, 1280, 720);
 
-	Segment segment{ {-2.0f, -1.0f, 0.0f}, {3.0f, 2.0f, 2.0f} };
-	Vector3 point{ -1.5f, 0.6f, 0.6f };
+	Sphere sphere[2];
+	sphere[0] = { {0.0f, 0.0f, 0.0f}, 0.5f };
+	sphere[1] = { {0.0f, 0.0f, 1.0f}, 0.5f };
 
 	// カメラの位置と角度
 	Vector3 cameraTranslate{ 0.0f, 1.9f, -6.49f };
@@ -54,8 +56,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 		
-		Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
-		Vector3 closestPoint = ClosestPoint(point, segment);
+		
 		
 		
 		
@@ -65,11 +66,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float (kWindowHeight),0.0f, 1.0f);
 		
-		Sphere pointSphere{ point, 0.01f }; // 1cmの球の描画
-		Sphere closestPointSphere{ closestPoint, 0.01f };
-
-		Vector3 start = Transform(Transform(segment.origin, viewProjectionMatrix), viewportMatrix);
-		Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), viewProjectionMatrix), viewportMatrix);
+		
 		
 		///
 		/// ↑更新処理ここまで
@@ -80,21 +77,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
-		DrawSphere(pointSphere, viewProjectionMatrix, viewportMatrix, RED);
-		DrawSphere(closestPointSphere, viewProjectionMatrix, viewportMatrix, BLACK);
-		
-		Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), WHITE);
-
-
+		DrawSphere(sphere[0], viewProjectionMatrix, viewportMatrix, WHITE);
+		if (IsCollision(sphere[0], sphere[1])) {
+			DrawSphere(sphere[1], viewProjectionMatrix, viewportMatrix, RED);
+		}
+		else {
+			DrawSphere(sphere[1], viewProjectionMatrix, viewportMatrix, WHITE);
+		}
 		ImGui::Begin("Window");
-		ImGui::InputFloat3("Point", &point.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat3("Segment origin", &segment.origin.x, "%0.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat3("Segment diff", &segment.diff.x, "%0.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat3("Project", &project.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
-		/*ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
-		ImGui::DragFloat3("GameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("SpherRadius", &sphere.radius, 0.01f);*/
+		ImGui::DragFloat3("SpherCenter1", &sphere[0].center.x, 0.01f);
+		ImGui::DragFloat("SpherRadius1", &sphere[0].radius, 0.01f);
+		ImGui::DragFloat3("SpherCenter2", &sphere[1].center.x, 0.01f);
+		ImGui::DragFloat("SpherRadius2", &sphere[1].radius, 0.01f);
 		ImGui::End();
 		///
 		/// ↑描画処理ここまで
