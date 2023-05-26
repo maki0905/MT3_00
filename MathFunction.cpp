@@ -1,7 +1,7 @@
 ﻿#include "MathFunction.h"
 #include <assert.h>
 // ベクトルの加法
-Vector3 Add(Vector3& v1, Vector3& v2) {
+Vector3 Add(const Vector3& v1, const Vector3& v2) {
 	Vector3 result;
 	result.x = v1.x + v2.x;
 	result.y = v1.y + v2.y;
@@ -10,7 +10,7 @@ Vector3 Add(Vector3& v1, Vector3& v2) {
 }
 
 // ベクトルの減法
-Vector3 Subtract(Vector3& v1, Vector3 v2) {
+Vector3 Subtract(const Vector3& v1, const Vector3 v2) {
 	Vector3 result;
 	result.x = v1.x - v2.x;
 	result.y = v1.y - v2.y;
@@ -28,21 +28,21 @@ Vector3 Multiply(const float& k, Vector3 v1) {
 }
 
 // 内積
-float Dot(Vector3& v1, Vector3& v2) {
+float Dot(const Vector3& v1, const Vector3& v2) {
 	float result;
 	result = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 	return result;
 }
 
 // 長さ(ノルム)
-float Length(Vector3& v1) {
+float Length(const Vector3& v1) {
 	float result;
 	result = sqrtf(Dot(v1, v1));
 	return result;
 }
 
 // 正規化
-Vector3 Normalize(Vector3& v1) {
+Vector3 Normalize(const Vector3& v1) {
 	Vector3 result = {0, 0, 0};
 	float length = Length(v1);
 	if (length != 0.0f) {
@@ -61,6 +61,32 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
 		v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1], 
 		v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2]
 	};
+
+	return result;
+}
+
+Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2)
+{
+	Matrix4x4 result;
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			result.m[i][j] = m1.m[i][j] + m2.m[i][j];
+		}
+	}
+
+	return result;
+}
+
+Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2)
+{
+	Matrix4x4 result;
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			result.m[i][j] = m1.m[i][j] - m2.m[i][j];
+		}
+	}
 
 	return result;
 }
@@ -248,6 +274,17 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 			m.m[0][1] * m.m[1][0] * m.m[2][2] -
 			m.m[0][0] * m.m[1][2] * m.m[2][1]);
 
+	return result;
+}
+
+Matrix4x4 Transpose(const Matrix4x4& m)
+{
+	Matrix4x4 result;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			result.m[i][j] = m.m[j][i];
+		}
+	}
 	return result;
 }
 
@@ -463,5 +500,22 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 	result.m[3][1] = top + (height / 2.0f);
 	result.m[3][2] = minDepth;
 
+	return result;
+}
+
+// 正射影ベクトル
+Vector3 Project(const Vector3& v1, const Vector3& v2)
+{
+	Vector3 result;
+	float t = Dot(v1, v2) / (Length(v2) * Length(v2));
+	result = Multiply(t, v2);
+	return result;
+}
+
+// 最近接点
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment)
+{
+	Vector3 result;
+	result = Add(segment.origin, Project(Subtract(point, segment.origin), segment.diff));
 	return result;
 }
