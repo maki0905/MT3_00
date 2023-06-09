@@ -31,6 +31,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// ライブラリの初期化
 	Novice::Initialize(kWindowTitle, 1280, 720);
 
+	Matrix4x4 viewMatrix;
+	Matrix4x4 projectionMatrix;
+	Matrix4x4 viewProjectionMatrix;
+	Matrix4x4 viewportMatrix;
+
+	// デバッグカメラ
+	bool isDebugCameraActive = false;
+	Matrix4x4 debugCamera = MakeIdentity4x4();
+	Vector3 debugCameraTranslate{ 0.0f, 0.0f, 0.0f };
+	Vector3 debugCameraRotate{ 0.0f, 0.0f, 0.0f };
+
 	Sphere sphere[2];
 	sphere[0] = { {0.0f, 0.0f, 0.0f}, 0.5f };
 	sphere[1] = { {0.0f, 0.0f, 1.0f}, 0.5f };
@@ -38,6 +49,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// カメラの位置と角度
 	Vector3 cameraTranslate{ 0.0f, 1.9f, -6.49f };
 	Vector3 cameraRotate{ 0.26f, 0.0f, 0.0f };
+	Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
 
 	// キー入力結果を受け取る箱
 	char keys[256] = {0};
@@ -58,13 +70,37 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 		
 		
+		if (keys[DIK_Q] != 0 && preKeys[DIK_Q] == 0) {
+			if (isDebugCameraActive == false) {
+				isDebugCameraActive = true;
+				debugCamera = cameraMatrix;
+				debugCameraRotate = cameraRotate;
+				debugCameraTranslate = cameraTranslate;
+			}
+			else {
+				isDebugCameraActive = false;
+			}
+		}
+		if (isDebugCameraActive == true) {
+			debugCamera = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, debugCameraRotate, debugCameraTranslate);
+			viewMatrix = Inverse(debugCamera);
+			projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
+			viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
+			viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
+			ImGui::Begin("DebugCamera");
+			ImGui::DragFloat3("Rotate", &debugCameraRotate.x, 0.01f);
+			ImGui::DragFloat3("Translate", &debugCameraTranslate.x, 0.01f);
+			ImGui::End();
+		}
+		else {
+			viewMatrix = Inverse(cameraMatrix);
+			projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
+			viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
+			viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
+		}
 		
 		
-		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
-		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
-		Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
-		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float (kWindowHeight),0.0f, 1.0f);
+		
 		
 		
 		
