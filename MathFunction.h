@@ -20,6 +20,9 @@ Vector3 Normalize(const Vector3& v1);
 // ベクトル変換
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
+//クロス積
+Vector3 Cross(const Vector3& v1, const Vector3& v2);
+
 // 行列の加法
 Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);
 // 行列の減法

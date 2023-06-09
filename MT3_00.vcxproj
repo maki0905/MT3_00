@@ -109,6 +109,7 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathFunction.cpp" />
+    <ClCompile Include="Plane.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\math\Matrix4x4.h" />
@@ -140,6 +141,7 @@
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="MathFunction.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="Sphere.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -8,6 +8,7 @@
 #include <cmath>
 #include <imgui.h>
 #include "Collision.h"
+#include "Plane.h"
 
 
 const char kWindowTitle[] = "LE1A_16_マキユキノリ_タイトル";
@@ -20,7 +21,7 @@ void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewporMatrix);
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
-
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -44,8 +45,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Sphere sphere[2];
 	sphere[0] = { {0.0f, 0.0f, 0.0f}, 0.5f };
-	sphere[1] = { {0.0f, 0.0f, 1.0f}, 0.5f };
-
+	
+	Plane plane = { {0.0f, 1.0f, 0.0f}, 0.5f };
 	// カメラの位置と角度
 	Vector3 cameraTranslate{ 0.0f, 1.9f, -6.49f };
 	Vector3 cameraRotate{ 0.26f, 0.0f, 0.0f };
@@ -100,7 +101,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		
 		
-		
+		ImGui::Begin("Window");
+		ImGui::DragFloat3("SpherCenter1", &sphere[0].center.x, 0.01f);
+		ImGui::DragFloat("SpherRadius1", &sphere[0].radius, 0.01f);
+		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
+		plane.normal = Normalize(plane.normal);
+		ImGui::DragFloat("Plane.distance", &plane.distance, 0.01f);
+		ImGui::End();
 		
 		
 		
@@ -113,19 +120,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
-		DrawSphere(sphere[0], viewProjectionMatrix, viewportMatrix, WHITE);
-		if (IsCollision(sphere[0], sphere[1])) {
-			DrawSphere(sphere[1], viewProjectionMatrix, viewportMatrix, RED);
+		if (IsCollision(sphere[0], plane)) {
+			DrawSphere(sphere[0], viewProjectionMatrix, viewportMatrix, RED);
 		}
 		else {
-			DrawSphere(sphere[1], viewProjectionMatrix, viewportMatrix, WHITE);
+			DrawSphere(sphere[0], viewProjectionMatrix, viewportMatrix, WHITE);
 		}
-		ImGui::Begin("Window");
-		ImGui::DragFloat3("SpherCenter1", &sphere[0].center.x, 0.01f);
-		ImGui::DragFloat("SpherRadius1", &sphere[0].radius, 0.01f);
-		ImGui::DragFloat3("SpherCenter2", &sphere[1].center.x, 0.01f);
-		ImGui::DragFloat("SpherRadius2", &sphere[1].radius, 0.01f);
-		ImGui::End();
+		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);
+		
 		///
 		/// ↑描画処理ここまで
 		///
@@ -239,4 +241,25 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 
 
 
+}
+
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+	Vector3 center = Multiply(plane.distance, plane.normal);
+	Vector3 perpendiculars[4];
+	perpendiculars[0] = Normalize(Perpendicular(plane.normal));
+	perpendiculars[1] = { -perpendiculars[0].x, -perpendiculars[0].y, -perpendiculars[0].z };
+	perpendiculars[2] = Cross(plane.normal, perpendiculars[0]);
+	perpendiculars[3] = { -perpendiculars[2].x, -perpendiculars[2].y, -perpendiculars[2].z };
+
+	Vector3 points[4];
+	for (int32_t index = 0; index < 4; ++index) {
+		Vector3 extend = Multiply(2.0f, perpendiculars[index]);
+		Vector3 point = Add(center, extend);
+		points[index] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
+	}
+
+	Novice::DrawLine(int(points[0].x), int(points[0].y), int(points[2].x), int(points[2].y), color);
+	Novice::DrawLine(int(points[1].x), int(points[1].y), int(points[2].x), int(points[2].y), color);
+	Novice::DrawLine(int(points[1].x), int(points[1].y), int(points[3].x), int(points[3].y), color);
+	Novice::DrawLine(int(points[3].x), int(points[3].y), int(points[0].x), int(points[0].y), color);
 }
