@@ -43,10 +43,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 debugCameraTranslate{ 0.0f, 0.0f, 0.0f };
 	Vector3 debugCameraRotate{ 0.0f, 0.0f, 0.0f };
 
-	Sphere sphere[2];
-	sphere[0] = { {0.0f, 0.0f, 0.0f}, 0.5f };
+	//Sphere sphere[2];
+	//sphere[0] = { {0.0f, 0.0f, 0.0f}, 0.5f };
 	
 	Plane plane = { {0.0f, 1.0f, 0.0f}, 0.5f };
+
+	Segment segment = { {0.5f, 1.5f, 0.0f}, {0.7f, 0.5f, 0.0f} };
 	// カメラの位置と角度
 	Vector3 cameraTranslate{ 0.0f, 1.9f, -6.49f };
 	Vector3 cameraRotate{ 0.26f, 0.0f, 0.0f };
@@ -102,11 +104,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 		
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("SpherCenter1", &sphere[0].center.x, 0.01f);
-		ImGui::DragFloat("SpherRadius1", &sphere[0].radius, 0.01f);
+		//ImGui::DragFloat3("SpherCenter1", &sphere[0].center.x, 0.01f);
+		//ImGui::DragFloat("SpherRadius1", &sphere[0].radius, 0.01f);
 		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
 		plane.normal = Normalize(plane.normal);
 		ImGui::DragFloat("Plane.distance", &plane.distance, 0.01f);
+		ImGui::DragFloat3("Line.origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("Line.diff", &segment.diff.x, 0.01f);
 		ImGui::End();
 		
 		
@@ -120,14 +124,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
-		if (IsCollision(sphere[0], plane)) {
+		/*if (IsCollision(sphere[0], plane)) {
 			DrawSphere(sphere[0], viewProjectionMatrix, viewportMatrix, RED);
 		}
 		else {
 			DrawSphere(sphere[0], viewProjectionMatrix, viewportMatrix, WHITE);
+		}*/
+		Vector3 screenPoint[2];
+		Vector3 ndcVertex = Transform(segment.origin, viewProjectionMatrix);
+		screenPoint[0] = Transform(ndcVertex, viewportMatrix);
+		ndcVertex = Transform(Add(segment.origin,segment.diff), viewProjectionMatrix);
+		screenPoint[1] = Transform(ndcVertex, viewportMatrix);
+		if (IsCollision(segment, plane)) {
+			
+			Novice::DrawLine(int(screenPoint[0].x), int(screenPoint[0].y), int(screenPoint[1].x), int(screenPoint[1].y), RED);
+		}
+		else {
+			Novice::DrawLine(int(screenPoint[0].x), int(screenPoint[0].y), int(screenPoint[1].x), int(screenPoint[1].y), WHITE);
 		}
 		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);
 		
+		
+
 		///
 		/// ↑描画処理ここまで
 		///
@@ -263,3 +281,4 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 	Novice::DrawLine(int(points[1].x), int(points[1].y), int(points[3].x), int(points[3].y), color);
 	Novice::DrawLine(int(points[3].x), int(points[3].y), int(points[0].x), int(points[0].y), color);
 }
+
