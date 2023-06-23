@@ -203,6 +203,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		else {
 			DrawAABB(aabb1, viewProjectionMatrix, viewportMatrix, WHITE);
 		}
+
 		DrawSphere(sphere[0], viewProjectionMatrix, viewportMatrix, WHITE);
 		///
 		/// ↑描画処理ここまで
