@@ -18,3 +18,5 @@ bool IsCollision(const Segment& segment, const Plane& plane);
 bool IsCollision(const Triangle& triangle, const Segment& segment);
 
 bool IsCollision(const AABB& aabb1, const AABB& aabb2);
+
+bool IsCollision(const Sphere& sphere, const AABB& aabb);
