@@ -84,3 +84,46 @@ bool IsCollision(const Segment& segment, const Plane& plane)
 
 	return false;
 }
+
+bool IsCollision(const Triangle& triangle, const Segment& segment)
+{
+	Vector3 v1 = Subtract(triangle.vertices[1], triangle.vertices[0]);
+	Vector3 v2 = Subtract(triangle.vertices[2], triangle.vertices[1]);
+	Vector3 normal = Normalize(Cross(v1, v2));
+	/*float distance = (normal.x * triangle.vertices[0].x) + (normal.y * triangle.vertices[0].y) + (normal.z * triangle.vertices[0].z);*/
+	float distance = Dot(triangle.vertices[0], normal);
+	float dot = Dot(normal, segment.diff);
+	// 垂直=平行であるので、衝突しているはずがない
+	if (dot == 0.0f) {
+		return false;
+	}
+
+	float t = (distance - Dot(segment.origin, normal)) / dot;
+
+	if (t < 0.0f || t > 1.0f) {
+		return false;
+	}
+
+	Vector3 p = Add(segment.origin, Multiply(t, segment.diff));
+
+	Vector3 v01 = Subtract(triangle.vertices[1], triangle.vertices[0]);
+	Vector3 v1p = Subtract(p, triangle.vertices[1]);
+	Vector3 v12 = Subtract(triangle.vertices[2], triangle.vertices[1]);
+	Vector3 v2p = Subtract(p, triangle.vertices[2]);
+	Vector3 v20 = Subtract(triangle.vertices[0], triangle.vertices[2]);
+	Vector3 v0p = Subtract(p, triangle.vertices[0]);
+	
+	// 各辺を結んだベクトルと、頂点と衝突点pを結んだベクトルのクロス積を取る
+	Vector3 cross01 = Cross(v01, v1p);
+	Vector3 cross12 = Cross(v12, v2p);
+	Vector3 cross20 = Cross(v20, v0p);
+
+	// すべての小三角形のクロス積と法線が同じ方向を向いていたら衝突
+	if (Dot(cross01, normal) >= 0.0f && Dot(cross12, normal) >= 0.0f && Dot(cross20, normal) >= 0.0f) {
+		return true;
+	}
+
+	return false;
+
+
+}

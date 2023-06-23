@@ -9,6 +9,8 @@
 #include <imgui.h>
 #include "Collision.h"
 #include "Plane.h"
+#include "Triangle.h"
+
 
 
 const char kWindowTitle[] = "LE1A_16_マキユキノリ_タイトル";
@@ -43,12 +45,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 debugCameraTranslate{ 0.0f, 0.0f, 0.0f };
 	Vector3 debugCameraRotate{ 0.0f, 0.0f, 0.0f };
 
+	
+
 	//Sphere sphere[2];
 	//sphere[0] = { {0.0f, 0.0f, 0.0f}, 0.5f };
 	
-	Plane plane = { {0.0f, 1.0f, 0.0f}, 0.5f };
+	//Plane plane = { {0.0f, 1.0f, 0.0f}, 0.5f };
 
-	Segment segment = { {0.5f, 1.5f, 0.0f}, {0.7f, 0.5f, 0.0f} };
+	Segment segment = { {1.5f, 0.0f, -0.5f}, {0.0f, 0.0f, 2.0f} };
+
+	Triangle triangle = { 
+		{ 
+			{0.0f, 1.0f, 0.0f}, 
+		    {1.0f, 0.0f, 0.0f}, 
+		     {-1.0f, 0.0f, 0.0f}
+		} 
+	};
 	// カメラの位置と角度
 	Vector3 cameraTranslate{ 0.0f, 1.9f, -6.49f };
 	Vector3 cameraRotate{ 0.26f, 0.0f, 0.0f };
@@ -106,11 +118,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Begin("Window");
 		//ImGui::DragFloat3("SpherCenter1", &sphere[0].center.x, 0.01f);
 		//ImGui::DragFloat("SpherRadius1", &sphere[0].radius, 0.01f);
-		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
-		plane.normal = Normalize(plane.normal);
-		ImGui::DragFloat("Plane.distance", &plane.distance, 0.01f);
+		//ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
+		//plane.normal = Normalize(plane.normal);
+		//ImGui::DragFloat("Plane.distance", &plane.distance, 0.01f);
 		ImGui::DragFloat3("Line.origin", &segment.origin.x, 0.01f);
 		ImGui::DragFloat3("Line.diff", &segment.diff.x, 0.01f);
+		ImGui::DragFloat3("Triangle.vertices[0]", &triangle.vertices[0].x, 0.01f);
+		ImGui::DragFloat3("Triangle.vertices[1]", &triangle.vertices[1].x, 0.01f);
+		ImGui::DragFloat3("Triangle.vertices[2]", &triangle.vertices[2].x, 0.01f);
 		ImGui::End();
 		
 		
@@ -130,22 +145,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		else {
 			DrawSphere(sphere[0], viewProjectionMatrix, viewportMatrix, WHITE);
 		}*/
-		Vector3 screenPoint[2];
-		Vector3 ndcVertex = Transform(segment.origin, viewProjectionMatrix);
-		screenPoint[0] = Transform(ndcVertex, viewportMatrix);
-		ndcVertex = Transform(Add(segment.origin,segment.diff), viewProjectionMatrix);
-		screenPoint[1] = Transform(ndcVertex, viewportMatrix);
-		if (IsCollision(segment, plane)) {
+		/*if (IsCollision(segment, plane)) {
 			
 			Novice::DrawLine(int(screenPoint[0].x), int(screenPoint[0].y), int(screenPoint[1].x), int(screenPoint[1].y), RED);
 		}
 		else {
 			Novice::DrawLine(int(screenPoint[0].x), int(screenPoint[0].y), int(screenPoint[1].x), int(screenPoint[1].y), WHITE);
 		}
-		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);
+		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);*/
+		if (IsCollision(triangle, segment)) {
+			DrawSegment(segment, viewProjectionMatrix, viewportMatrix, RED);
+		}
+		else {
+			DrawSegment(segment, viewProjectionMatrix, viewportMatrix, WHITE);
+		}
 		
-		
+		DrawTriangle(triangle, viewProjectionMatrix, viewportMatrix, WHITE);
 
+		
 		///
 		/// ↑描画処理ここまで
 		///
