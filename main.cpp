@@ -10,7 +10,7 @@
 #include "Collision.h"
 #include "Plane.h"
 #include "Triangle.h"
-
+#include "AABB.h"
 
 
 const char kWindowTitle[] = "LE1A_16_マキユキノリ_タイトル";
@@ -61,6 +61,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		     {-1.0f, 0.0f, 0.0f}
 		} 
 	};
+
+	AABB aabb1{
+		.min{-0.5f, -0.5f, -0.5f},
+		.max{0.0f, 0.0f, 0.0f}
+	};
+	AABB aabb2{
+		.min{0.2f, 0.2f, 0.2f},
+		.max{1.0f, 1.0f, 1.0f}
+	};
+
+
 	// カメラの位置と角度
 	Vector3 cameraTranslate{ 0.0f, 1.9f, -6.49f };
 	Vector3 cameraRotate{ 0.26f, 0.0f, 0.0f };
@@ -121,11 +132,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
 		//plane.normal = Normalize(plane.normal);
 		//ImGui::DragFloat("Plane.distance", &plane.distance, 0.01f);
-		ImGui::DragFloat3("Line.origin", &segment.origin.x, 0.01f);
+		/*ImGui::DragFloat3("Line.origin", &segment.origin.x, 0.01f);
 		ImGui::DragFloat3("Line.diff", &segment.diff.x, 0.01f);
 		ImGui::DragFloat3("Triangle.vertices[0]", &triangle.vertices[0].x, 0.01f);
 		ImGui::DragFloat3("Triangle.vertices[1]", &triangle.vertices[1].x, 0.01f);
-		ImGui::DragFloat3("Triangle.vertices[2]", &triangle.vertices[2].x, 0.01f);
+		ImGui::DragFloat3("Triangle.vertices[2]", &triangle.vertices[2].x, 0.01f);*/
+		ImGui::DragFloat3("aabb1.min", &aabb1.min.x, 0.01f);
+		ImGui::DragFloat3("aabb1.max", &aabb1.max.x, 0.01f);
+		aabb1.min.x = (std::min)(aabb1.min.x, aabb1.max.x);
+		aabb1.max.x = (std::max)(aabb1.min.x, aabb1.max.x);
+		aabb1.min.y = (std::min)(aabb1.min.y, aabb1.max.y);
+		aabb1.max.y = (std::max)(aabb1.min.y, aabb1.max.y);
+		aabb1.min.z = (std::min)(aabb1.min.z, aabb1.max.z);
+		aabb1.max.z = (std::max)(aabb1.min.z, aabb1.max.z);
+		ImGui::DragFloat3("aabb2.min", &aabb2.min.x, 0.01f);
+		ImGui::DragFloat3("aabb2.max", &aabb2.max.x, 0.01f);
+		aabb2.min.x = (std::min)(aabb2.min.x, aabb2.max.x);
+		aabb2.max.x = (std::max)(aabb2.min.x, aabb2.max.x);
+		aabb2.min.y = (std::min)(aabb2.min.y, aabb2.max.y);
+		aabb2.max.y = (std::max)(aabb2.min.y, aabb2.max.y);
+		aabb2.min.z = (std::min)(aabb2.min.z, aabb2.max.z);
+		aabb2.max.z = (std::max)(aabb2.min.z, aabb2.max.z);
 		ImGui::End();
 		
 		
@@ -153,14 +180,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			Novice::DrawLine(int(screenPoint[0].x), int(screenPoint[0].y), int(screenPoint[1].x), int(screenPoint[1].y), WHITE);
 		}
 		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);*/
-		if (IsCollision(triangle, segment)) {
+		/*if (IsCollision(triangle, segment)) {
 			DrawSegment(segment, viewProjectionMatrix, viewportMatrix, RED);
 		}
 		else {
 			DrawSegment(segment, viewProjectionMatrix, viewportMatrix, WHITE);
 		}
 		
-		DrawTriangle(triangle, viewProjectionMatrix, viewportMatrix, WHITE);
+		DrawTriangle(triangle, viewProjectionMatrix, viewportMatrix, WHITE);*/
+
+		if (IsCollision(aabb1, aabb2)) {
+			DrawAABB(aabb1, viewProjectionMatrix, viewportMatrix, RED);
+		}
+		else {
+			DrawAABB(aabb1, viewProjectionMatrix, viewportMatrix, WHITE);
+		}
+		DrawAABB(aabb2, viewProjectionMatrix, viewportMatrix, WHITE);
 
 		
 		///
