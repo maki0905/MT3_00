@@ -52,7 +52,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 	//Plane plane = { {0.0f, 1.0f, 0.0f}, 0.5f };
 
-	Segment segment = { {1.5f, 0.0f, -0.5f}, {0.0f, 0.0f, 2.0f} };
+	Segment segment = { 
+		.origin{0.7f, 0.3f, 0.0f}, 
+		.diff{2.0f, -0.5f, 0.5f} 
+	};
 
 	Triangle triangle = { 
 		{ 
@@ -64,7 +67,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	AABB aabb1{
 		.min{-0.5f, -0.5f, -0.5f},
-		.max{0.0f, 0.0f, 0.0f}
+		.max{0.5f, 0.5f, 0.5f}
 	};
 	/*AABB aabb2{
 		.min{0.2f, 0.2f, 0.2f},
@@ -127,14 +130,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 		
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("SpherCenter1", &sphere[0].center.x, 0.01f);
+		//ImGui::DragFloat3("SpherCenter1", &sphere[0].center.x, 0.01f);
 		//ImGui::DragFloat("SpherRadius1", &sphere[0].radius, 0.01f);
 		//ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
 		//plane.normal = Normalize(plane.normal);
 		//ImGui::DragFloat("Plane.distance", &plane.distance, 0.01f);
-		/*ImGui::DragFloat3("Line.origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("Line.origin", &segment.origin.x, 0.01f);
 		ImGui::DragFloat3("Line.diff", &segment.diff.x, 0.01f);
-		ImGui::DragFloat3("Triangle.vertices[0]", &triangle.vertices[0].x, 0.01f);
+		/*ImGui::DragFloat3("Triangle.vertices[0]", &triangle.vertices[0].x, 0.01f);
 		ImGui::DragFloat3("Triangle.vertices[1]", &triangle.vertices[1].x, 0.01f);
 		ImGui::DragFloat3("Triangle.vertices[2]", &triangle.vertices[2].x, 0.01f);*/
 		ImGui::DragFloat3("aabb1.min", &aabb1.min.x, 0.01f);
@@ -196,15 +199,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			DrawAABB(aabb1, viewProjectionMatrix, viewportMatrix, WHITE);
 		}
 		DrawAABB(aabb2, viewProjectionMatrix, viewportMatrix, WHITE);*/
-
-		if (IsCollision(sphere[0], aabb1)) {
+		DrawSegment(segment, viewProjectionMatrix, viewportMatrix, WHITE);
+		if (IsCollision(aabb1,segment)) {
 			DrawAABB(aabb1, viewProjectionMatrix, viewportMatrix, RED);
 		}
 		else {
 			DrawAABB(aabb1, viewProjectionMatrix, viewportMatrix, WHITE);
 		}
+		/*if (IsCollision(sphere[0], aabb1)) {
+			DrawAABB(aabb1, viewProjectionMatrix, viewportMatrix, RED);
+		}
+		else {
+			DrawAABB(aabb1, viewProjectionMatrix, viewportMatrix, WHITE);
+		}*/
 
-		DrawSphere(sphere[0], viewProjectionMatrix, viewportMatrix, WHITE);
+		//DrawSphere(sphere[0], viewProjectionMatrix, viewportMatrix, WHITE);
 		///
 		/// ↑描画処理ここまで
 		///
