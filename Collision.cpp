@@ -171,3 +171,41 @@ bool IsCollision(const AABB& aabb, const Segment& segment)
 	}
 	return false;
 }
+
+bool IsCollision(const OBB& obb, const Sphere& sphere)
+{
+	Matrix4x4 W;
+	W.m[0][0] = obb.orientations[0].x;
+	W.m[0][1] = obb.orientations[0].y;
+	W.m[0][2] = obb.orientations[0].z;
+	W.m[0][3] = 0;
+	W.m[1][0] = obb.orientations[1].x;
+	W.m[1][1] = obb.orientations[1].y;
+	W.m[1][2] = obb.orientations[1].z;
+	W.m[1][3] = 0;
+	W.m[2][0] = obb.orientations[2].x;
+	W.m[2][1] = obb.orientations[2].y;
+	W.m[2][2] = obb.orientations[2].z;
+	W.m[2][3] = 0;
+	W.m[3][0] = obb.center.x;
+	W.m[3][1] = obb.center.y;
+	W.m[3][2] = obb.center.z;
+	W.m[3][3] = 1;
+	Matrix4x4 WInverse = Inverse(W);
+	Vector3 centerInOBBLocalSpace = Transform(sphere.center, WInverse);
+	AABB aabbOBBLocal{
+		.min{Multiply(-1.0f, obb.size)},
+		.max{obb.size }
+	};
+	Sphere sphereOBBLocal{
+		.center{centerInOBBLocalSpace},
+		.radius{sphere.radius}
+	};
+
+	// ローカル空間で衝突判定
+	if (IsCollision(sphereOBBLocal, aabbOBBLocal)) {
+		return true;
+	}
+	
+	return false;
+}

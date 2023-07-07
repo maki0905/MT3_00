@@ -415,6 +415,13 @@ Matrix4x4 MakeRotateZMatrix(float radian) {
 	return result;
 }
 
+Matrix4x4 MakeRotate(const Vector3& rotate)
+{
+	Matrix4x4 result = Multiply(MakeRotateXMatrix(rotate.x), Multiply(MakeRotateYMatrix(rotate.y), MakeRotateZMatrix(rotate.z)));
+	
+	return result;
+}
+
 // アフィン変換行列
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rot, const Vector3& translate) {
 	Matrix4x4 result;

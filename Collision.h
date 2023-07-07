@@ -4,6 +4,7 @@
 #include "Line.h"
 #include "Triangle.h"
 #include "AABB.h"
+#include "OBB.h"
 
 bool IsCollision(const Sphere& sphere1, const Sphere& sphere2);
 
@@ -22,3 +23,5 @@ bool IsCollision(const AABB& aabb1, const AABB& aabb2);
 bool IsCollision(const Sphere& sphere, const AABB& aabb);
 
 bool IsCollision(const AABB& aabb, const Segment& segment);
+
+bool IsCollision(const OBB& obb, const Sphere& sphere);
